@@ -12,8 +12,8 @@ const (
 )
 
 var (
-	TimeoutError      = errgo.New("Operation aborted. Timeout occured")
-	MaxRetriesReached = errgo.New("Operation aborted. To many errors.")
+	TimeoutError         = errgo.New("Operation aborted. Timeout occured")
+	MaxRetriesReachedErr = errgo.New("Operation aborted. To many errors.")
 )
 
 // Do performs the given operation. Based on the options, it can retry the operation,
@@ -52,7 +52,7 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 			if options.Checker != nil && options.Checker(lastError) {
 				// Check max retries
 				if tryCounter >= options.MaxTries {
-					return errgo.WithCausef(lastError, MaxRetriesReached, "Tries %d > %d", tryCounter, options.MaxTries)
+					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "Tries %d > %d", tryCounter, options.MaxTries)
 				}
 
 				if options.Sleep > 0 {
