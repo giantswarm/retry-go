@@ -40,7 +40,9 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 		// Check if we reached the timeout
 		select {
 		case <-timeout:
-			return errgo.Mask(TimeoutError, errgo.Any)
+			if options.Timeout > 0 {
+				return errgo.Mask(TimeoutError, errgo.Any)
+			}
 		default:
 		}
 
@@ -52,7 +54,7 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 			if options.Checker != nil && options.Checker(lastError) {
 				// Check max retries
 				if tryCounter >= options.MaxTries {
-					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "Tries %d > %d", tryCounter, options.MaxTries)
+					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "retry limit reached (%d/%d)", tryCounter, options.MaxTries)
 				}
 
 				if options.Sleep > 0 {
