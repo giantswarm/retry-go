@@ -2,6 +2,8 @@ package retry
 
 import (
 	"time"
+
+	"github.com/juju/errgo"
 )
 
 type RetryOption func(options *retryOptions)
@@ -45,11 +47,12 @@ func newRetryOptions(options ...RetryOption) retryOptions {
 	state := retryOptions{
 		Timeout:  DefaultTimeout,
 		MaxTries: DefaultMaxTries,
-		Retryer:  errgo.Any,
+		Checker:  errgo.Any,
 	}
 
 	for _, option := range options {
 		option(&state)
 	}
+
 	return state
 }

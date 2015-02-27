@@ -34,7 +34,11 @@ var (
 func Do(op func() error, retryOptions ...RetryOption) error {
 	options := newRetryOptions(retryOptions...)
 
-	timeout := time.After(options.Timeout)
+	var timeout <-chan time.Time
+	if options.Timeout > 0 {
+		timeout = time.After(options.Timeout)
+	}
+
 	tryCounter := 0
 	for {
 		// Check if we reached the timeout
@@ -52,7 +56,7 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 			if options.Checker != nil && options.Checker(lastError) {
 				// Check max retries
 				if tryCounter >= options.MaxTries {
-					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "Tries %d > %d", tryCounter, options.MaxTries)
+					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "retry limit reached (%d/%d)", tryCounter, options.MaxTries)
 				}
 
 				if options.Sleep > 0 {
