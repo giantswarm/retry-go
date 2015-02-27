@@ -34,15 +34,17 @@ var (
 func Do(op func() error, retryOptions ...RetryOption) error {
 	options := newRetryOptions(retryOptions...)
 
-	timeout := time.After(options.Timeout)
+	var timeout <-chan time.Time
+	if options.Timeout > 0 {
+		timeout = time.After(options.Timeout)
+	}
+
 	tryCounter := 0
 	for {
 		// Check if we reached the timeout
 		select {
 		case <-timeout:
-			if options.Timeout > 0 {
-				return errgo.Mask(TimeoutError, errgo.Any)
-			}
+			return errgo.Mask(TimeoutError, errgo.Any)
 		default:
 		}
 
