@@ -36,18 +36,37 @@ func Sleep(d time.Duration) RetryOption {
 	}
 }
 
+// AfterRetry is called after a retry and can be used e.g. to emit events.
+func AfterRetry(afterRetry func(err error)) RetryOption {
+	return func(options *retryOptions) {
+		options.AfterRetry = afterRetry
+	}
+}
+
+// AfterRetryLimit is called after a retry limit is reached and can be used
+// e.g. to emit events.
+func AfterRetryLimit(afterRetryLimit func(err error)) RetryOption {
+	return func(options *retryOptions) {
+		options.AfterRetryLimit = afterRetryLimit
+	}
+}
+
 type retryOptions struct {
-	Timeout  time.Duration
-	MaxTries int
-	Checker  func(err error) bool
-	Sleep    time.Duration
+	Timeout         time.Duration
+	MaxTries        int
+	Checker         func(err error) bool
+	Sleep           time.Duration
+	AfterRetry      func(err error)
+	AfterRetryLimit func(err error)
 }
 
 func newRetryOptions(options ...RetryOption) retryOptions {
 	state := retryOptions{
-		Timeout:  DefaultTimeout,
-		MaxTries: DefaultMaxTries,
-		Checker:  errgo.Any,
+		Timeout:         DefaultTimeout,
+		MaxTries:        DefaultMaxTries,
+		Checker:         errgo.Any,
+		AfterRetry:      func(err error) {},
+		AfterRetryLimit: func(err error) {},
 	}
 
 	for _, option := range options {
