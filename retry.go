@@ -51,11 +51,13 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 		// Execute the op
 		tryCounter++
 		lastError := op()
+		options.AfterRetry(lastError)
 
 		if lastError != nil {
 			if options.Checker != nil && options.Checker(lastError) {
 				// Check max retries
 				if tryCounter >= options.MaxTries {
+					options.AfterRetryLimit(lastError)
 					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "retry limit reached (%d/%d)", tryCounter, options.MaxTries)
 				}
 
