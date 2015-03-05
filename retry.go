@@ -6,11 +6,6 @@ import (
 	"github.com/juju/errgo"
 )
 
-const (
-	DefaultMaxTries = 3
-	DefaultTimeout  = time.Duration(15 * time.Second)
-)
-
 var (
 	TimeoutError         = errgo.New("Operation aborted. Timeout occured")
 	MaxRetriesReachedErr = errgo.New("Operation aborted. To many errors.")

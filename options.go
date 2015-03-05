@@ -6,6 +6,11 @@ import (
 	"github.com/juju/errgo"
 )
 
+const (
+	DefaultMaxTries = 3
+	DefaultTimeout  = time.Duration(15 * time.Second)
+)
+
 type RetryOption func(options *retryOptions)
 
 // Timeout specifies the maximum time that should be used before aborting the retry loop.
