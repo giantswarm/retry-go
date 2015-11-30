@@ -6,11 +6,6 @@ import (
 	"github.com/juju/errgo"
 )
 
-var (
-	TimeoutError         = errgo.New("Operation aborted. Timeout occured")
-	MaxRetriesReachedErr = errgo.New("Operation aborted. To many errors.")
-)
-
 // Do performs the given operation. Based on the options, it can retry the operation,
 // if it failed.
 //
@@ -53,7 +48,7 @@ func Do(op func() error, retryOptions ...RetryOption) error {
 				// Check max retries
 				if tryCounter >= options.MaxTries {
 					options.AfterRetryLimit(lastError)
-					return errgo.WithCausef(lastError, MaxRetriesReachedErr, "retry limit reached (%d/%d)", tryCounter, options.MaxTries)
+					return errgo.WithCausef(lastError, MaxRetriesReachedError, "retry limit reached (%d/%d)", tryCounter, options.MaxTries)
 				}
 
 				if options.Sleep > 0 {
