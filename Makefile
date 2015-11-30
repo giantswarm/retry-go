@@ -4,7 +4,7 @@ BUILD_PATH := $(shell pwd)/.gobuild
 
 PROJECT_PATH := "$(BUILD_PATH)/src/github.com/giantswarm"
 
-BIN=client-go
+BIN=$(PROJECT)
 
 .PHONY:all clean get-deps fmt run-tests
 
