@@ -11,6 +11,13 @@ const (
 	DefaultTimeout  = time.Duration(15 * time.Second)
 )
 
+// Not is a helper to invert another .
+func Not(checker func(err error) bool) func(err error) bool {
+	return func(err error) bool {
+		return !checker(err)
+	}
+}
+
 type RetryOption func(options *retryOptions)
 
 // Timeout specifies the maximum time that should be used before aborting the retry loop.
